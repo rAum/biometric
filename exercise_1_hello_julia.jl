@@ -41,6 +41,7 @@ end
 #zad 5
 using Images
 using ImageView
+using Color
 
 function toGrayscaleArray(o)
   return convert(Array, data(convert(Image{Gray}, float32(separate(o)))));
@@ -67,19 +68,6 @@ fingerprint = fingerprints[2]
 showFingerprint(fingerprint)
 
 raw = reinterpret(Float32, (fingerprint))
-
-mean(raw)
-std(raw)
-
-
-lerp(x, min, max) = (x - min) ./ max
-
-a = minimum(raw)
-b = maximum(raw)
-
-using Color
-
-Color.colormap("RdBu")
 
 function colorize(grayscaleImage, colorMap)
   cm = colormap(colorMap)
