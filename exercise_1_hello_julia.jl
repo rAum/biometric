@@ -29,7 +29,7 @@ x = [0 0.2 0.5]
 m = [0 0.2 0]
 s = [1.0 0.3 1]
 
-gaussian1d(x, m, s) = 1./sqrt(s*2*π).*exp(-(x-m).^2/(2*s))
+gaussian1d(x, m, s) = 1./sqrt(s*2*π).*exp(-(x-m).^2./(2*s))
 println(gaussian1d(x, m, s))
 
 A = [x; m; s]'
@@ -44,7 +44,7 @@ using ImageView
 using Color
 
 function toGrayscaleArray(o)
-  return convert(Array, data(convert(Image{Gray}, float32(separate(o)))));
+  return convert(Array, Images.data(convert(Image{Gray}, float32(separate(o)))));
 end;
 
 function loadImage(image)
