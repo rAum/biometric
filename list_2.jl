@@ -1,3 +1,5 @@
+######### exercise 2.1
+
 function multiGauss(Σ, X, μ)
   n = length(μ)
   Xμ = X - μ
@@ -7,13 +9,13 @@ function multiGauss(Σ, X, μ)
 end
 
 Σ  = eye(2)
-x1 = [0.2, 1.3]
-x2 = [2.2, -1.3]
 u  = [0, 1]
-multiGauss(Σ, x1, u)
-multiGauss(Σ, x2, u)
 
-typeof(Σ)
+x1 = [0.2, 1.3]
+multiGauss(Σ, x1, u)
+
+x2 = [2.2, -1.3]
+multiGauss(Σ, x2, u)
 
 type NormalDistribution
   Σ::Matrix # covariance matrix
@@ -29,7 +31,7 @@ function density(a::NormalDistribution, X::Vector)
 end
 
 density(NormalDistribution(Σ, u), x1)
-
+density(NormalDistribution(Σ, u), x2)
 
 
 function distribution(a::NormalDistribution, X)
@@ -43,6 +45,7 @@ nd.Σ
 
 
 ###################################################
+### exercise 2.2
 μ1 = [1, 1]
 μ2 = [3, 3]
 Σ1 = Σ2 = eye(2)
@@ -53,8 +56,6 @@ type ObjectClass
   Φ::NormalDistribution
 end
 
-a = ObjectClass("A", 0.5, NormalDistribution(Σ1, μ1))
-b = ObjectClass("B", 0.5, NormalDistribution(Σ2, μ2))
 function bayes(a::ObjectClass, b::ObjectClass, x)
   to_a = density(a.Φ, x) * a.ω
   to_b = density(b.Φ, x) * b.ω
@@ -76,10 +77,49 @@ function bayes(a::ObjectClass, b::ObjectClass, x)
   end
 end
 
+a = ObjectClass("A", 0.5, NormalDistribution(Σ1, μ1))
+b = ObjectClass("B", 0.5, NormalDistribution(Σ2, μ2))
 x = [1.8, 1.8]
 bayes(a, b, x)
 
 ###############################################
+# exercise 2.3
+function normrnd(μ, σ)
+  u = v = s = 0
+  while s >= 1 || s == 0
+    u = rand() * 2.0 - 1.0
+    v = rand() * 2.0 - 1.0
+    s = u * u + v * v
+  end
+  return μ + σ * u * sqrt(-2.0 * log(s) / s)
+end
+
+function normrnd(μ, σ, N::Int)
+  [normrnd(μ, σ) for i in range(1,N)]
+end
+
+function normrnd(μ, σ, N::Int, M::Int)
+  map(x -> normrnd(μ, σ), zeros(N, M))
+end
+
+μ=0.0
+σ=1
+v = normrnd(μ, σ, 130)
+w = normrnd(μ, σ, 2, 5)
+
+function singlevariableNormalRandom(μ, σ, N=1::Int)
+  rep(μ, N, 1) + randn(N, 1)*σ
+end
+
+normrnd(mu,sigma,m,n)
+
+normrnd(0.5, 0.1)
+
+singlevariableNormalRandom(0.5, 1.0, 10)
+
+
+###############################################
+# exercise 2.4
 
 function multivariateNormalRandom(a::NormalDistribution, N=1::Int)
   R = chol(a.Σ)
@@ -110,5 +150,9 @@ function multivariateNormalRandom2(a::NormalDistribution, N=1::Int)
   repmat(a.μ', N, 1) + boxmuller(N, size(a.μ)[1]) * R
 end
 
-multivariateNormalRandom2(nd, 10)
+multivariateNormalRandom2(nd, 5)
+
+###################################################
+
+
 
