@@ -127,6 +127,7 @@ function multivariateNormalRandom(a::NormalDistribution, N=1::Int)
 end
 
 multivariateNormalRandom(nd, 5)
+vec(multivariateNormalRandom(nd, 1))
 
 function boxmuller()
   U1 = rand()
@@ -153,6 +154,31 @@ end
 multivariateNormalRandom2(nd, 5)
 
 ###################################################
+## exercise 2.5
+function getLabel(Ω)
+  r = rand()
+  label = 0
+  for value in Ω
+    label += 1
+    if value > r
+      break
+    end
+  end
+  return label
+end
 
+function toMatrix(foo)
+  flat(A) = mapreduce(x->isa(x,Array)? flat(x): x, vcat, A)
+  reshape(flat(foo), length(foo[1]), length(foo))'
+end
 
+function generateData(N::Int, ω::Vector, nd::Vector{NormalDistribution})
+  cummulativeProbability = cumsum(ω[1:end])
+  y = [ getLabel(cummulativeProbability) for i in 1:N]
+  X = map(label -> vec(multivariateNormalRandom(nd[label], 1)), y)
+  return toMatrix(X), vec(y)
+end
 
+ω = vec([0.5 0.5])
+distributions = vec([NormalDistribution(Σ1, μ1), NormalDistribution(Σ2, μ2)])
+X, y = generateData(10, ω, distributions)
