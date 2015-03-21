@@ -172,9 +172,9 @@ function generateData(N::Int, ω::Vector, nd::Vector{NormalDistribution})
   return hcat(X...)', vec(y)
 end
 
-ω = vec([0.5 0.5])
+ω = vec([0.1 0.9])
 distributions = vec([NormalDistribution(Σ1, μ1), NormalDistribution(Σ2, μ2)])
-X, y = generateData(10, ω, distributions)
+X, y = generateData(1000, ω, distributions)
 
 
 #############################################
@@ -182,7 +182,18 @@ X, y = generateData(10, ω, distributions)
 import PyPlot
 using PyPlot
 pygui(true)
-x = [-pi:0.2:pi];
-plot(x, sin(x), ".")
-PyPlot.show()
+
+function foo(v)
+  if v == 1 return "red" end;
+  return "blue"
+end
+
+plt.scatter(X[:,1], X[:,2], color=c)
+μ = [μ1 μ2]'
+plt.scatter(μ[:,1], μ[:,2], color=["yellow","green"], marker="s")
+plt.show()
+
+#v = vec(singlevariableNormalRandom(10, 5, 10000))
+#PyPlot.plt.hist(v,50)
+#PyPlot.show()
 
