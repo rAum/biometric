@@ -55,17 +55,15 @@ type ObjectClass
   Φ::NormalDistribution
 end
 
-function bayes(a::ObjectClass, b::ObjectClass, x)
-  to_a = density(a.Φ, x) * a.ω
-  to_b = density(b.Φ, x) * b.ω
+function bayes(p_xa::Float64, p_a::Float64)
+  p_ax = p_xa * p_a
+  p_nax = (1.0 - p_xa) * (1.0 - p_a)
+  return p_ax / (p_ax + p_nax)
+end
 
-  its_a = to_a / (to_a + to_b)
-  its_b = to_b / (to_b + to_a)
-
-  print_with_color(:red, "A=")
-  println(its_a)
-  print_with_color(:green, "B=")
-  println(its_b)
+function naivebayes(a::ObjectClass, b::ObjectClass, x)
+  its_a = bayes(density(a.Φ, x), a.ω)
+  its_b = bayes(density(b.Φ, x), b.ω)
 
   if its_a > its_b
     return a.name
@@ -75,11 +73,14 @@ function bayes(a::ObjectClass, b::ObjectClass, x)
     return "equal"
   end
 end
+a = ObjectClass("A", 0.333, NormalDistribution(Σ1, μ1))
+b = ObjectClass("B", 0.666, NormalDistribution(Σ2, μ2))
+x = [1.8, 1.8]
+show(naivebayes(a, b, x))
 
 a = ObjectClass("A", 0.5, NormalDistribution(Σ1, μ1))
 b = ObjectClass("B", 0.5, NormalDistribution(Σ2, μ2))
-x = [1.8, 1.8]
-bayes(a, b, x)
+show(naivebayes(a, b, x))
 
 ###############################################
 # exercise 2.3
@@ -100,6 +101,7 @@ end
 function normrnd(μ, σ, N::Int, M::Int)
   map(x -> normrnd(μ, σ), zeros(N, M))
 end
+
 
 μ=0.0
 σ=1
@@ -172,45 +174,17 @@ function generateData(N::Int, ω::Vector, nd::Vector{NormalDistribution})
   return hcat(X...)', vec(y)
 end
 
-ω = vec([0.1 0.9])
+ω = vec([0.5 0.5])
 distributions = vec([NormalDistribution(Σ1, μ1), NormalDistribution(Σ2, μ2)])
-X, y = generateData(1000, ω, distributions)
+X, y = generateData(10, ω, distributions)
 
 
 #############################################
 # exercise 2.6
 import PyPlot
-
-toColor(y) = map(x -> x == 1? "red" : "blue", y)
-
-function draw2d(X::Matrix, y::Vector, μ::Matrix)
-  PyPlot.plt.clf()
-  PyPlot.plt.scatter(X[:,1], X[:,2], color=toColor(y))
-  μ = μ'
-  PyPlot.plt.scatter(μ[:,1], μ[:,2], color=["black","green"], marker="s")
-  PyPlot.plt.show()
-end
-
-getValuesOfClass(class, k) = map(x -> x[1], filter(x -> x[2] == class, k))
-
-function draw1d(X::Matrix, y::Vector, μ, Dimmension=1::Int)
-  PyPlot.plt.clf()
-  merged = zip (X[:,Dimmension], y)
-  c = getValuesOfClass(2, merged)
-  PyPlot.plt.plot(c, c, "r.")
-  c = getValuesOfClass(1, merged)
-  PyPlot.plt.plot(c, c, "b.")
-  μ = μ'
-  PyPlot.plt.plot(μ[:,Dimmension],μ[:,Dimmension], "s", c="black")
-  PyPlot.plt.show()
-end
-
-μ = [μ1 μ2]
-draw2d(X, y, μ)
-draw1d(X, y, μ)
-draw1d(X, y, μ, 2)
-
-#v = vec(singlevariableNormalRandom(10, 5, 10000))
-#PyPlot.plt.hist(v,50)
-#PyPlot.show()
+using PyPlot
+pygui(true)
+x = [-pi:0.2:pi];
+plot(x, sin(x), ".")
+PyPlot.show()
 
