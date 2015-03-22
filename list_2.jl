@@ -180,18 +180,35 @@ X, y = generateData(1000, ω, distributions)
 #############################################
 # exercise 2.6
 import PyPlot
-using PyPlot
-pygui(true)
 
-function foo(v)
-  if v == 1 return "red" end;
-  return "blue"
+toColor(y) = map(x -> x == 1? "red" : "blue", y)
+
+function draw2d(X::Matrix, y::Vector, μ::Matrix)
+  PyPlot.plt.clf()
+  PyPlot.plt.scatter(X[:,1], X[:,2], color=toColor(y))
+  μ = μ'
+  PyPlot.plt.scatter(μ[:,1], μ[:,2], color=["black","green"], marker="s")
+  PyPlot.plt.show()
 end
 
-plt.scatter(X[:,1], X[:,2], color=c)
-μ = [μ1 μ2]'
-plt.scatter(μ[:,1], μ[:,2], color=["yellow","green"], marker="s")
-plt.show()
+getValuesOfClass(class, k) = map(x -> x[1], filter(x -> x[2] == class, k))
+
+function draw1d(X::Matrix, y::Vector, μ, Dimmension=1::Int)
+  PyPlot.plt.clf()
+  merged = zip (X[:,Dimmension], y)
+  c = getValuesOfClass(2, merged)
+  PyPlot.plt.plot(c, c, "r.")
+  c = getValuesOfClass(1, merged)
+  PyPlot.plt.plot(c, c, "b.")
+  μ = μ'
+  PyPlot.plt.plot(μ[:,Dimmension],μ[:,Dimmension], "s", c="black")
+  PyPlot.plt.show()
+end
+
+μ = [μ1 μ2]
+draw2d(X, y, μ)
+draw1d(X, y, μ)
+draw1d(X, y, μ, 2)
 
 #v = vec(singlevariableNormalRandom(10, 5, 10000))
 #PyPlot.plt.hist(v,50)
